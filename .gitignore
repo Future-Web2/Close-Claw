@@ -1,0 +1,33 @@
+# ── Secrets & Environment ──────────────────────────────────────
+.env
+!.env.example
+
+# ── Token Store (encrypted data) ──────────────────────────────
+token_store/tokens.enc
+token_store/.salt
+
+# ── Generated child bots ───────────────────────────────────────
+bots/
+
+# ── Python ─────────────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── OS ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Node (if dashboard deps added later) ───────────────────────
+node_modules/
+
+# ── Logs ───────────────────────────────────────────────────────
+*.log
+logs/

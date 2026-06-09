@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloseCLAW — AI Bot Commander</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a14;
+  --bg2: #080f1e;
+  --glass: rgba(10, 25, 50, 0.6);
+  --glass2: rgba(0, 200, 255, 0.04);
+  --border: rgba(0, 200, 255, 0.12);
+  --cyan: #00c8ff;
+  --cyan2: #0ff;
+  --green: #00ff88;
+  --purple: #a855f7;
+  --orange: #f97316;
+  --red: #ff4466;
+  --text: #e0f0ff;
+  --muted: #5a7a9a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,100,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,200,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 60% 40%, rgba(160,85,247,0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grid overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 40px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.logo-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #0050ff, var(--cyan));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  box-shadow: 0 0 30px rgba(0,200,255,0.3);
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 20px rgba(0,200,255,0.3); }
+  50% { box-shadow: 0 0 40px rgba(0,200,255,0.6), 0 0 80px rgba(0,200,255,0.2); }
+}
+.logo h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+.logo h1 span { color: var(--cyan); }
+.logo p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.status-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 500;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* Section titles */
+.section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Glass card */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  backdrop-filter: blur(20px);
+  transition: border-color 0.3s, transform 0.3s;
+}
+.card:hover {
+  border-color: rgba(0,200,255,0.25);
+  transform: translateY(-2px);
+}
+
+/* Grid layouts */
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 20px; }
+
+/* Stats */
+.stat-card { text-align: center; }
+.stat-value { font-size: 36px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+/* Architecture diagram */
+.arch-diagram {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 24px 0;
+}
+.arch-node {
+  flex: 1;
+  background: var(--glass2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 16px;
+  text-align: center;
+  position: relative;
+}
+.arch-node .icon { font-size: 32px; margin-bottom: 10px; }
+.arch-node .name { font-size: 13px; font-weight: 600; }
+.arch-node .desc { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.arch-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: var(--cyan);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.arch-node.highlight-cyan { border-color: rgba(0,200,255,0.35); background: rgba(0,200,255,0.05); }
+.arch-node.highlight-green { border-color: rgba(0,255,136,0.35); background: rgba(0,255,136,0.05); }
+.arch-node.highlight-purple { border-color: rgba(168,85,247,0.35); background: rgba(168,85,247,0.05); }
+.arch-node.highlight-orange { border-color: rgba(249,115,22,0.35); background: rgba(249,115,22,0.05); }
+
+/* Router diagram */
+.router-section { margin-top: 32px; }
+.router-box {
+  background: var(--glass);
+  border: 1px solid rgba(0,200,255,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--cyan);
+  font-size: 15px;
+  position: relative;
+}
+.routes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+.route-card {
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+}
+.route-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+}
+.route-card.local {
+  border-color: rgba(0,255,136,0.25);
+  background: rgba(0,255,136,0.04);
+}
+.route-card.local::before { background: var(--green); }
+.route-card.cloud {
+  border-color: rgba(0,200,255,0.25);
+  background: rgba(0,200,255,0.04);
+}
+.route-card.cloud::before { background: var(--cyan); }
+.route-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.route-card.local .route-title { color: var(--green); }
+.route-card.cloud .route-title { color: var(--cyan); }
+.route-items { list-style: none; }
+.route-items li { font-size: 12px; color: var(--muted); padding: 3px 0; }
+.route-items li::before { content: '→ '; color: inherit; opacity: 0.7; }
+
+/* Commands list */
+.cmd-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 10px; }
+.cmd-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(0,200,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: background 0.2s;
+}
+.cmd-item:hover { background: rgba(0,200,255,0.07); }
+.cmd-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--cyan);
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 120px;
+}
+.cmd-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+/* Security model */
+.security-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.sec-item {
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid;
+}
+.sec-item.private { border-color: rgba(0,255,136,0.2); background: rgba(0,255,136,0.04); }
+.sec-item.cloud-s { border-color: rgba(0,200,255,0.2); background: rgba(0,200,255,0.04); }
+.sec-item.encrypted { border-color: rgba(168,85,247,0.2); background: rgba(168,85,247,0.04); }
+.sec-icon { font-size: 28px; margin-bottom: 10px; }
+.sec-label { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.sec-item.private .sec-label { color: var(--green); }
+.sec-item.cloud-s .sec-label { color: var(--cyan); }
+.sec-item.encrypted .sec-label { color: var(--purple); }
+.sec-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* File tree */
+.file-tree { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.9; }
+.ft-dir { color: var(--cyan); }
+.ft-file { color: #8ab4d4; }
+.ft-comment { color: var(--muted); margin-left: 8px; }
+.ft-new { color: var(--green); }
+.ft-indent { padding-left: 20px; }
+.ft-indent2 { padding-left: 40px; }
+
+/* Terminal preview */
+.terminal {
+  background: #020c14;
+  border: 1px solid rgba(0,200,255,0.15);
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.t-bar {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.t-dot { width: 12px; height: 12px; border-radius: 50%; }
+.t-prompt { color: var(--green); }
+.t-cmd { color: var(--text); }
+.t-output { color: var(--muted); }
+.t-highlight { color: var(--cyan); }
+.t-success { color: var(--green); }
+.t-warn { color: var(--orange); }
+
+/* Tech stack badges */
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.badge {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(0,200,255,0.07);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.badge.green { background: rgba(0,255,136,0.07); border-color: rgba(0,255,136,0.2); color: var(--green); }
+.badge.cyan { background: rgba(0,200,255,0.07); border-color: rgba(0,200,255,0.2); color: var(--cyan); }
+.badge.purple { background: rgba(168,85,247,0.07); border-color: rgba(168,85,247,0.2); color: var(--purple); }
+.badge.orange { background: rgba(249,115,22,0.07); border-color: rgba(249,115,22,0.2); color: var(--orange); }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 30px; }
+.timeline::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:2px; background: linear-gradient(to bottom, var(--cyan), var(--purple), transparent); }
+.tl-item { position: relative; margin-bottom: 28px; }
+.tl-dot { position:absolute; left:-24px; top:4px; width:12px; height:12px; border-radius:50%; border:2px solid var(--cyan); background:var(--bg); }
+.tl-item:nth-child(2) .tl-dot { border-color: var(--green); }
+.tl-item:nth-child(3) .tl-dot { border-color: var(--purple); }
+.tl-item:nth-child(4) .tl-dot { border-color: var(--orange); }
+.tl-phase { font-size: 11px; color: var(--muted); margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.tl-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.tl-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+section { margin-bottom: 48px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-32 { margin-bottom: 32px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🤖</div>
+      <div>
+        <h1>Close<span>CLAW</span></h1>
+        <p>AI-Powered Telegram Bot Commander</p>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="dot"></div>
+      Planning Mode — v1.0
+    </div>
+  </header>
+
+  <!-- Stats Row -->
+  <section>
+    <div class="section-title">System Overview</div>
+    <div class="grid-3">
+      <div class="card stat-card">
+        <div class="stat-value" style="color:var(--cyan)">2</div>
+        <div class="stat-label">AI Backends</div>
+        <div class="stat-sub">Ollama (local) + io.net (cloud)</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value" style="color:var(--green)">∞</div>
+        <div class="stat-label">Bots You Can Create</div>
+        <div class="stat-sub">Auto-generated Node.js bots</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-value" style="color:var(--purple)">AES-256</div>
+        <div class="stat-label">Token Encryption</div>
+        <div class="stat-sub">All secrets encrypted at rest</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section>
+    <div class="section-title">System Architecture</div>
+    <div class="card">
+      <div class="arch-diagram">
+        <div class="arch-node highlight-cyan">
+          <div class="icon">✈️</div>
+          <div class="name">Telegram User</div>
+          <div class="desc">Sends natural language commands via Telegram chat</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node highlight-cyan">
+          <div class="icon">🤖</div>
+          <div class="name">CloseCLAW Bot</div>
+          <div class="desc">Master Python bot. Whitelist-protected. Routes all requests.</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node highlight-orange">
+          <div class="icon">🧠</div>
+          <div class="name">AI Router</div>
+          <div class="desc">Classifies task type and selects the right AI backend</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node highlight-green">
+          <div class="icon">🔒</div>
+          <div class="name">Executor</div>
+          <div class="desc">Runs shell commands, creates bots, manages tokens</div>
+        </div>
+      </div>
+
+      <div class="router-section">
+        <div class="router-box">🔀 Intelligent Task Router</div>
+        <div class="routes">
+          <div class="route-card local">
+            <div class="route-title">🔒 LOCAL — Ollama AI (Privacy Mode)</div>
+            <ul class="route-items">
+              <li>OS commands & shell execution</li>
+              <li>File read/write/edit operations</li>
+              <li>System administration tasks</li>
+              <li>Anything touching local secrets</li>
+              <li>Task classification (stays private)</li>
+            </ul>
+          </div>
+          <div class="route-card cloud">
+            <div class="route-title">☁️ CLOUD — io.net AI (Creative Mode)</div>
+            <ul class="route-items">
+              <li>Generate Telegram bot code (Node.js)</li>
+              <li>Write complex scripts & programs</li>
+              <li>Explain concepts & answer questions</li>
+              <li>Scaffold full projects</li>
+              <li>Large context / heavy token tasks</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bot Commands -->
+  <section>
+    <div class="section-title">Available Commands</div>
+    <div class="card">
+      <div class="cmd-grid">
+        <div class="cmd-item">
+          <div class="cmd-name">/start</div>
+          <div class="cmd-desc">Welcome message, system status and quick help</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/run &lt;cmd&gt;</div>
+          <div class="cmd-desc">Execute shell command directly on Linux server</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/ai &lt;prompt&gt;</div>
+          <div class="cmd-desc">Ask cloud AI (io.net) — for code gen & complex tasks</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/local &lt;prompt&gt;</div>
+          <div class="cmd-desc">Ask local Ollama AI — private, never leaves server</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/createbot</div>
+          <div class="cmd-desc">Generate, save and launch a new TG bot from description</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/bots</div>
+          <div class="cmd-desc">List all created bots and their running status</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/stopbot &lt;name&gt;</div>
+          <div class="cmd-desc">Stop a running bot process via pm2</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/tokens</div>
+          <div class="cmd-desc">List all stored Telegram bot tokens (encrypted)</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/addtoken</div>
+          <div class="cmd-desc">Add a new bot token to encrypted storage</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/removetoken</div>
+          <div class="cmd-desc">Remove a token from secure storage</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">/status</div>
+          <div class="cmd-desc">Show CPU, RAM, disk usage and running bots count</div>
+        </div>
+        <div class="cmd-item">
+          <div class="cmd-name">&lt;any text&gt;</div>
+          <div class="cmd-desc">Auto smart mode — AI router picks best backend</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security Model -->
+  <section>
+    <div class="section-title">Security Model</div>
+    <div class="security-grid">
+      <div class="sec-item private">
+        <div class="sec-icon">🔒</div>
+        <div class="sec-label">OS Tasks → Local Only</div>
+        <div class="sec-desc">Shell commands, file operations, and system tasks are processed exclusively by Ollama running on localhost. Zero data leaves your server.</div>
+      </div>
+      <div class="sec-item cloud-s">
+        <div class="sec-icon">☁️</div>
+        <div class="sec-label">Code Tasks → io.net Cloud</div>
+        <div class="sec-desc">Only non-sensitive code generation prompts go to io.net. No secrets, paths, or system info are ever included in cloud requests.</div>
+      </div>
+      <div class="sec-item encrypted">
+        <div class="sec-icon">🛡️</div>
+        <div class="sec-label">Tokens → AES-256 Encrypted</div>
+        <div class="sec-desc">All Telegram bot tokens stored in AES-256 encrypted file. Whitelist of Telegram user IDs prevents unauthorized access to the master bot.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- File Structure & Terminal -->
+  <div class="grid-2 mb-32">
+    <div>
+      <div class="section-title">Project Structure</div>
+      <div class="card">
+        <div class="file-tree">
+          <div><span class="ft-dir">CloseCLAW/</span></div>
+          <div class="ft-indent"><span class="ft-new">├── bot.py</span><span class="ft-comment"># Master TG bot</span></div>
+          <div class="ft-indent"><span class="ft-file">├── .env</span><span class="ft-comment"># Secrets (never commit)</span></div>
+          <div class="ft-indent"><span class="ft-file">├── requirements.txt</span></div>
+          <div class="ft-indent"><span class="ft-dir">├── brain/</span></div>
+          <div class="ft-indent2"><span class="ft-new">├── router.py</span><span class="ft-comment"># Route: local vs cloud</span></div>
+          <div class="ft-indent2"><span class="ft-new">├── ollama_client.py</span></div>
+          <div class="ft-indent2"><span class="ft-new">├── ionet_client.py</span></div>
+          <div class="ft-indent2"><span class="ft-new">├── executor.py</span><span class="ft-comment"># Shell runner</span></div>
+          <div class="ft-indent2"><span class="ft-new">└── bot_factory.py</span><span class="ft-comment"># Create new bots</span></div>
+          <div class="ft-indent"><span class="ft-dir">├── token_store/</span></div>
+          <div class="ft-indent2"><span class="ft-new">├── token_manager.py</span></div>
+          <div class="ft-indent2"><span class="ft-file">└── tokens.enc</span><span class="ft-comment"># AES-256 encrypted</span></div>
+          <div class="ft-indent"><span class="ft-dir">├── bots/</span><span class="ft-comment"># Generated bots live here</span></div>
+          <div class="ft-indent2"><span class="ft-dir">└── [bot_name]/</span></div>
+          <div class="ft-indent"><span class="ft-dir">├── templates/</span></div>
+          <div class="ft-indent2"><span class="ft-new">└── node_bot.js</span><span class="ft-comment"># Node.js base template</span></div>
+          <div class="ft-indent"><span class="ft-dir">└── dashboard/</span></div>
+          <div class="ft-indent2"><span class="ft-new">└── index.html</span><span class="ft-comment"># This page!</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Example Terminal Session</div>
+      <div class="terminal">
+        <div class="t-bar">
+          <div class="t-dot" style="background:#ff5f57"></div>
+          <div class="t-dot" style="background:#ffbd2e"></div>
+          <div class="t-dot" style="background:#28c941"></div>
+        </div>
+        <div><span class="t-prompt">You → </span><span class="t-cmd">create a weather telegram bot</span></div>
+        <div><span class="t-highlight">🧠 Routing to io.net (code generation)...</span></div>
+        <div><span class="t-output">Generating Node.js bot code...</span></div>
+        <div><span class="t-output">Writing to bots/weather_bot/index.js</span></div>
+        <div><span class="t-output">Running: npm install in bots/weather_bot/</span></div>
+        <div><span class="t-output">Starting: pm2 start weather_bot</span></div>
+        <div><span class="t-success">✅ @weather_bot is LIVE!</span></div>
+        <br>
+        <div><span class="t-prompt">You → </span><span class="t-cmd">/run df -h</span></div>
+        <div><span class="t-highlight">🔒 Running locally (no AI needed)...</span></div>
+        <div><span class="t-output">Filesystem  Size  Used  Avail  Use%</span></div>
+        <div><span class="t-output">/dev/sda1    50G   12G    38G   24%</span></div>
+        <br>
+        <div><span class="t-prompt">You → </span><span class="t-cmd">/addtoken mybot 12345:ABC...</span></div>
+        <div><span class="t-success">🔐 Token 'mybot' stored (AES-256 encrypted)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Implementation Timeline -->
+  <section>
+    <div class="section-title">Implementation Phases</div>
+    <div class="card">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-phase">Phase 1</div>
+          <div class="tl-title" style="color:var(--cyan)">Core Bot + AI Brain</div>
+          <div class="tl-desc">Master Telegram bot with whitelist auth. AI router. Ollama local client. io.net cloud client. Shell command executor.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-phase">Phase 2</div>
+          <div class="tl-title" style="color:var(--green)">Bot Factory</div>
+          <div class="tl-desc">Auto-generate complete Node.js Telegram bots from a text description. Save, install deps, launch with pm2, manage lifecycle.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-phase">Phase 3</div>
+          <div class="tl-title" style="color:var(--purple)">Token Manager</div>
+          <div class="tl-desc">AES-256 encrypted token storage. Add/list/remove tokens via Telegram commands. Tokens usable by bot factory.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-phase">Phase 4</div>
+          <div class="tl-title" style="color:var(--orange)">Web Dashboard</div>
+          <div class="tl-desc">This visual dashboard served from the Linux server. Live bot status, command history, system stats.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section>
+    <div class="section-title">Technology Stack</div>
+    <div class="card">
+      <div class="badges">
+        <div class="badge green">🐍 Python (Master Bot)</div>
+        <div class="badge cyan">🟢 Node.js (Generated Bots)</div>
+        <div class="badge green">🦙 Ollama (Local AI)</div>
+        <div class="badge cyan">☁️ io.net Intelligence API</div>
+        <div class="badge purple">🔐 cryptography (AES-256)</div>
+        <div class="badge orange">⚙️ pm2 (Process Manager)</div>
+        <div class="badge cyan">📨 python-telegram-bot</div>
+        <div class="badge purple">🐧 Linux (Ubuntu/Debian)</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
