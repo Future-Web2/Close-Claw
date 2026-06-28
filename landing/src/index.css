@@ -1,0 +1,155 @@
+/* ════════════════════════════════════════════════
+   LIQUID GLASS — DESIGN SYSTEM
+   CloseCLAW Landing Page
+   ════════════════════════════════════════════════ */
+
+/* === ANIMATABLE PROPERTIES === */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --shimmer-pos {
+  syntax: '<percentage>';
+  initial-value: -100%;
+  inherits: false;
+}
+
+/* === DESIGN TOKENS === */
+:root {
+  /* Background */
+  --bg-void: #030308;
+  --bg-primary: #050510;
+  --bg-secondary: #0a0a1a;
+  --bg-elevated: #0e0e22;
+
+  /* Accent Palette — Electric / Neon / Cosmic */
+  --accent-cyan: #00e5ff;
+  --accent-blue: #4f8fff;
+  --accent-purple: #a855f7;
+  --accent-violet: #7c3aed;
+  --accent-pink: #ec4899;
+  --accent-magenta: #d946ef;
+  --accent-orange: #ff6b35;
+  --accent-green: #22c55e;
+
+  /* Text */
+  --text-primary: #f0f2ff;
+  --text-secondary: #9ca3bf;
+  --text-muted: #5b6080;
+
+  /* Liquid Glass — Core */
+  --liquid-bg: rgba(255, 255, 255, 0.03);
+  --liquid-bg-hover: rgba(255, 255, 255, 0.06);
+  --liquid-border: rgba(255, 255, 255, 0.08);
+  --liquid-border-hover: rgba(255, 255, 255, 0.16);
+  --liquid-highlight: rgba(255, 255, 255, 0.12);
+  --liquid-blur: 24px;
+  --liquid-blur-heavy: 40px;
+
+  /* Liquid Glass — Refraction */
+  --refraction-1: rgba(0, 229, 255, 0.05);
+  --refraction-2: rgba(168, 85, 247, 0.05);
+  --refraction-3: rgba(236, 72, 153, 0.04);
+
+  /* Shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-glass-hover: 0 16px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-glow-cyan: 0 0 30px rgba(0, 229, 255, 0.15), 0 0 60px rgba(0, 229, 255, 0.05);
+  --shadow-glow-purple: 0 0 30px rgba(168, 85, 247, 0.15), 0 0 60px rgba(168, 85, 247, 0.05);
+
+  /* Spacing */
+  --section-gap: 120px;
+  --container-max: 1140px;
+
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-medium: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Typography */
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Radii */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-pill: 100px;
+}
+
+/* === RESET === */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* === SCROLLBAR — Liquid Glass === */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-void);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.2), rgba(168, 85, 247, 0.2));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0, 229, 255, 0.4), rgba(168, 85, 247, 0.4));
+}
+
+/* === SELECTION === */
+::selection {
+  background: rgba(0, 229, 255, 0.2);
+  color: var(--text-primary);
+}
+
+/* === GLOBAL ANIMATIONS === */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+  0% { --shimmer-pos: -100%; }
+  100% { --shimmer-pos: 200%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes borderGlow {
+  0% { --glow-angle: 0deg; }
+  100% { --glow-angle: 360deg; }
+}
