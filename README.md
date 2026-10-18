@@ -19,6 +19,8 @@
 
 *Control your Linux server, spawn AI-powered bots, and route tasks intelligently — all from Telegram.*
 
+📺 **[Interactive Guide (RU)](docs/guide.html)** — пошаговая интерактивная презентация на русском
+
 </div>
 
 ---

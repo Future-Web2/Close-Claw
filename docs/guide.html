@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloseCLAW — Полный Гайд</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #050a14;
+  --bg2: #0a1628;
+  --glass: rgba(10,25,50,0.75);
+  --border: rgba(0,200,255,0.15);
+  --cyan: #00c8ff;
+  --cyan2: #00ffff;
+  --green: #00ff88;
+  --purple: #a855f7;
+  --orange: #f97316;
+  --red: #ff4466;
+  --text: #e0f0ff;
+  --muted: #5a7a9a;
+  --yellow: #fbbf24;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Animated background ── */
+.bg-anim {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,100,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,200,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 60% 40%, rgba(160,85,247,0.05) 0%, transparent 50%);
+}
+
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,200,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── Particles ── */
+.particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.particle {
+  position: absolute;
+  width: 3px; height: 3px;
+  background: var(--cyan);
+  border-radius: 50%;
+  opacity: 0;
+  animation: float-particle linear infinite;
+}
+@keyframes float-particle {
+  0% { opacity: 0; transform: translateY(100vh) scale(0); }
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+}
+
+/* ── Slide Container ── */
+.slide-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 60px;
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  pointer-events: none;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+
+.slide.exit {
+  opacity: 0;
+  transform: translateX(-80px);
+}
+
+/* ── Typography ── */
+.slide-number {
+  position: absolute;
+  top: 30px; left: 40px;
+  font-size: 14px;
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 2px;
+}
+
+h1 {
+  font-size: clamp(28px, 5vw, 56px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+h1 .gradient {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: clamp(22px, 3.5vw, 40px);
+  font-weight: 700;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+h2 .step-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-right: 10px;
+  vertical-align: middle;
+  -webkit-text-fill-color: #fff;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--muted);
+  text-align: center;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  backdrop-filter: blur(20px);
+  width: 100%;
+  max-width: 880px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.feature-card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s, transform 0.3s;
+}
+.feature-card:hover {
+  border-color: var(--cyan);
+  transform: translateY(-4px);
+}
+.feature-card .icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+.feature-card .title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feature-card .desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ── Code blocks ── */
+.code-block {
+  background: #0a0f1f;
+  border: 1px solid rgba(0,200,255,0.1);
+  border-radius: 12px;
+  padding: 20px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 800px;
+  margin: 12px 0;
+  position: relative;
+}
+.code-block .lang-tag {
+  position: absolute;
+  top: 8px; right: 12px;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.code-block .prompt { color: var(--green); }
+.code-block .comment { color: #4a6a8a; }
+.code-block .cmd { color: var(--cyan2); }
+.code-block .flag { color: var(--purple); }
+.code-block .string { color: var(--yellow); }
+.code-block .key { color: var(--orange); }
+.code-block .value { color: var(--green); }
+.code-block .dim { color: var(--muted); }
+
+/* ── Env table ── */
+.env-table {
+  width: 100%;
+  max-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.env-table th {
+  background: rgba(0,200,255,0.08);
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.env-table td {
+  padding: 12px 18px;
+  font-size: 14px;
+  border-top: 1px solid rgba(0,200,255,0.06);
+  vertical-align: top;
+}
+.env-table tr:nth-child(even) td {
+  background: rgba(0,200,255,0.02);
+}
+.env-table code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--cyan);
+  background: rgba(0,200,255,0.08);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* ── Command table ── */
+.cmd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 860px;
+}
+.cmd-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.3s;
+}
+.cmd-row:hover { border-color: var(--cyan); }
+.cmd-row .c {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--cyan);
+  min-width: 200px;
+  flex-shrink: 0;
+}
+.cmd-row .d {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── Architecture ── */
+.arch-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 780px;
+}
+.arch-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.arch-node {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 22px;
+  text-align: center;
+  min-width: 140px;
+  transition: all 0.3s;
+}
+.arch-node:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0,200,255,0.15);
+  transform: scale(1.05);
+}
+.arch-node .n-icon { font-size: 26px; margin-bottom: 6px; }
+.arch-node .n-title { font-size: 13px; font-weight: 600; }
+.arch-node .n-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.arch-arrow {
+  color: var(--cyan);
+  font-size: 22px;
+  opacity: 0.5;
+}
+.arch-node.highlight { border-color: var(--cyan); box-shadow: 0 0 25px rgba(0,200,255,0.2); }
+
+/* ── Progress bar ── */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  z-index: 100;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 10px rgba(0,200,255,0.5);
+}
+
+/* ── Navigation ── */
+.nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(5,10,20,0.9);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  z-index: 50;
+}
+.nav-btn {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-btn:hover {
+  border-color: var(--cyan);
+  background: rgba(0,200,255,0.08);
+}
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.nav-btn.primary {
+  background: linear-gradient(135deg, rgba(0,200,255,0.2), rgba(168,85,247,0.2));
+  border-color: var(--cyan);
+}
+.nav-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(0,200,255,0.15);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.dot.active {
+  background: var(--cyan);
+  box-shadow: 0 0 10px rgba(0,200,255,0.5);
+  transform: scale(1.3);
+}
+.dot:hover { background: rgba(0,200,255,0.4); }
+
+.slide-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ── Autoplay ── */
+.autoplay-btn {
+  position: fixed;
+  top: 20px; right: 20px;
+  z-index: 100;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+  display: flex; align-items: center; gap: 6px;
+}
+.autoplay-btn:hover { border-color: var(--cyan); }
+.autoplay-btn.playing { border-color: var(--green); color: var(--green); }
+
+/* ── Keyboard hint ── */
+.kb-hint {
+  position: fixed;
+  bottom: 80px; right: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  z-index: 50;
+  font-family: 'JetBrains Mono', monospace;
+  opacity: 0.6;
+}
+kbd {
+  background: rgba(0,200,255,0.08);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+/* ── Animated entry for cards ── */
+.anim-in { animation: slideUp 0.6s ease both; }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Logo ASCII ── */
+.ascii-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(8px, 1.5vw, 14px);
+  line-height: 1.3;
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(0,200,255,0.3);
+  white-space: pre;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* ── Warning / info boxes ── */
+.info-box {
+  display: flex;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: rgba(0,200,255,0.05);
+  border: 1px solid rgba(0,200,255,0.15);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 800px;
+  width: 100%;
+  margin-top: 12px;
+}
+.info-box.warn {
+  background: rgba(251,191,36,0.06);
+  border-color: rgba(251,191,36,0.2);
+}
+.info-box .ib-icon { font-size: 22px; flex-shrink: 0; }
+
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.tag.required { background: rgba(255,68,102,0.15); color: var(--red); }
+.tag.optional { background: rgba(0,255,136,0.1); color: var(--green); }
+
+/* ── Scrollable slide content ── */
+.slide-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
+  padding: 10px;
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,200,255,0.2) transparent;
+}
+.slide-inner::-webkit-scrollbar { width: 5px; }
+.slide-inner::-webkit-scrollbar-track { background: transparent; }
+.slide-inner::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="bg-anim"></div>
+<div class="grid-overlay"></div>
+<div class="particles" id="particles"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<button class="autoplay-btn" id="autoplayBtn" onclick="toggleAutoplay()">
+  <span id="apIcon">▶</span> <span id="apText">Автоплей</span>
+</button>
+
+<div class="slide-container" id="slideContainer">
+
+  <!-- ═══════ SLIDE 0: TITLE ═══════ -->
+  <div class="slide active" data-slide="0">
+    <div class="slide-inner">
+      <div class="ascii-logo">
+ ██████╗██╗      ██████╗ ███████╗███████╗ ██████╗██╗      █████╗ ██╗    ██╗
+██╔════╝██║     ██╔═══██╗██╔════╝██╔════╝██╔════╝██║     ██╔══██╗██║    ██║
+██║     ██║     ██║   ██║███████╗█████╗  ██║     ██║     ███████║██║ █╗ ██║
+██║     ██║     ██║   ██║╚════██║██╔══╝  ██║     ██║     ██╔══██║██║███╗██║
+╚██████╗███████╗╚██████╔╝███████║███████╗╚██████╗███████╗██║  ██║╚███╔███╔╝
+ ╚═════╝╚══════╝ ╚═════╝ ╚══════╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝
+      </div>
+      <h1><span class="gradient">AI Bot Commander</span></h1>
+      <p class="subtitle">Полный гайд по установке и использованию<br>
+        Управляй Linux-сервером, создавай ботов и роути задачи — из Telegram</p>
+      <div style="margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+        <span class="tag" style="background:rgba(0,200,255,0.1); color:var(--cyan);">Python 3.10+</span>
+        <span class="tag" style="background:rgba(168,85,247,0.1); color:var(--purple);">Telegram Bot API</span>
+        <span class="tag" style="background:rgba(249,115,22,0.1); color:var(--orange);">io.net Cloud AI</span>
+        <span class="tag" style="background:rgba(0,255,136,0.1); color:var(--green);">Ollama Local AI</span>
+      </div>
+      <div style="margin-top: 40px; color: var(--muted); font-size: 14px; animation: pulse 2s infinite alternate;">
+        Нажмите <kbd>→</kbd> или кнопку ниже чтобы начать →
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 1: WHAT IS CLOSECLAW ═══════ -->
+  <div class="slide" data-slide="1">
+    <div class="slide-inner">
+      <span class="slide-number">01 / 11</span>
+      <h2>🤖 Что такое CloseCLAW?</h2>
+      <p class="subtitle" style="margin-bottom: 24px;">Мастер-бот в Телеграме, который даёт тебе полный контроль над Linux-сервером через ИИ</p>
+      <div class="card-grid">
+        <div class="feature-card anim-in" style="animation-delay: 0.1s;">
+          <div class="icon">🖥️</div>
+          <div class="title">Shell-команды</div>
+          <div class="desc">Выполняй любые Linux-команды прямо из Telegram с live-выводом</div>
+        </div>
+        <div class="feature-card anim-in" style="animation-delay: 0.2s;">
+          <div class="icon">☁️</div>
+          <div class="title">Cloud AI (io.net)</div>
+          <div class="desc">Llama 3.3 70B для сложных задач — код, анализ, креатив</div>
+        </div>
+        <div class="feature-card anim-in" style="animation-delay: 0.3s;">
+          <div class="icon">🔒</div>
+          <div class="title">Local AI (Ollama)</div>
+          <div class="desc">Приватный ИИ на твоём сервере — данные никуда не уходят</div>
+        </div>
+        <div class="feature-card anim-in" style="animation-delay: 0.4s;">
+          <div class="icon">🏭</div>
+          <div class="title">Bot Factory</div>
+          <div class="desc">Генерируй и запускай новых Telegram-ботов через ИИ за секунды</div>
+        </div>
+        <div class="feature-card anim-in" style="animation-delay: 0.5s;">
+          <div class="icon">🔐</div>
+          <div class="title">Token Store</div>
+          <div class="desc">AES-256 шифрованное хранилище токенов дочерних ботов</div>
+        </div>
+        <div class="feature-card anim-in" style="animation-delay: 0.6s;">
+          <div class="icon">🧠</div>
+          <div class="title">Smart Router</div>
+          <div class="desc">Автоматически решает куда отправить запрос — локально или в облако</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 2: ARCHITECTURE ═══════ -->
+  <div class="slide" data-slide="2">
+    <div class="slide-inner">
+      <span class="slide-number">02 / 11</span>
+      <h2>🏗️ Архитектура системы</h2>
+      <p class="subtitle" style="margin-bottom: 24px;">Как устроен CloseCLAW внутри</p>
+      <div class="arch-box">
+        <div class="arch-row">
+          <div class="arch-node highlight">
+            <div class="n-icon">📱</div>
+            <div class="n-title">Telegram</div>
+            <div class="n-sub">Пользователь</div>
+          </div>
+        </div>
+        <div class="arch-arrow">▼</div>
+        <div class="arch-row">
+          <div class="arch-node highlight" style="border-color: var(--purple); box-shadow: 0 0 25px rgba(168,85,247,0.2);">
+            <div class="n-icon">🤖</div>
+            <div class="n-title">CloseCLAW Master Bot</div>
+            <div class="n-sub">bot.py — точка входа</div>
+          </div>
+        </div>
+        <div class="arch-arrow">▼</div>
+        <div class="arch-row">
+          <div class="arch-node">
+            <div class="n-icon">🧠</div>
+            <div class="n-title">Router</div>
+            <div class="n-sub">Умный роутинг</div>
+          </div>
+          <div class="arch-node">
+            <div class="n-icon">⚙️</div>
+            <div class="n-title">Executor</div>
+            <div class="n-sub">Shell команды</div>
+          </div>
+          <div class="arch-node">
+            <div class="n-icon">🏭</div>
+            <div class="n-title">Bot Factory</div>
+            <div class="n-sub">Создание ботов</div>
+          </div>
+          <div class="arch-node">
+            <div class="n-icon">🔐</div>
+            <div class="n-title">Token Store</div>
+            <div class="n-sub">AES-256</div>
+          </div>
+        </div>
+        <div class="arch-arrow">▼</div>
+        <div class="arch-row">
+          <div class="arch-node" style="border-color: rgba(249,115,22,0.3);">
+            <div class="n-icon">☁️</div>
+            <div class="n-title">io.net API</div>
+            <div class="n-sub">Облачный AI</div>
+          </div>
+          <div class="arch-node" style="border-color: rgba(0,255,136,0.3);">
+            <div class="n-icon">🦙</div>
+            <div class="n-title">Ollama</div>
+            <div class="n-sub">Локальный AI</div>
+          </div>
+          <div class="arch-node" style="border-color: rgba(255,68,102,0.3);">
+            <div class="n-icon">🐧</div>
+            <div class="n-title">Linux Server</div>
+            <div class="n-sub">Shell / OS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 3: STEP 1 — CLONE ═══════ -->
+  <div class="slide" data-slide="3">
+    <div class="slide-inner">
+      <span class="slide-number">03 / 11</span>
+      <h2><span class="step-badge">ШАГ 1</span> Клонируй репозиторий</h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Скачай проект с GitHub на свой сервер</p>
+      <div class="code-block" style="max-width: 700px;">
+        <span class="lang-tag">bash</span>
+        <span class="comment"># Клонируем репозиторий</span><br>
+        <span class="prompt">$</span> <span class="cmd">git clone</span> <span class="string">https://github.com/Future-Web2/Close-Claw.git</span><br>
+        <br>
+        <span class="comment"># Заходим в папку</span><br>
+        <span class="prompt">$</span> <span class="cmd">cd</span> <span class="string">Close-Claw</span>
+      </div>
+      <div class="info-box">
+        <span class="ib-icon">📂</span>
+        <div>
+          <strong>Структура проекта:</strong><br>
+          <code style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--cyan);">
+            bot.py</code> — главный файл бота<br>
+          <code style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--cyan);">
+            brain/</code> — логика AI и выполнения команд<br>
+          <code style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--cyan);">
+            token_store/</code> — зашифрованное хранилище<br>
+          <code style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--cyan);">
+            dashboard/</code> — веб-панель мониторинга
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 4: STEP 2 — VENV ═══════ -->
+  <div class="slide" data-slide="4">
+    <div class="slide-inner">
+      <span class="slide-number">04 / 11</span>
+      <h2><span class="step-badge">ШАГ 2</span> Установи зависимости</h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Создай виртуальное окружение и поставь пакеты</p>
+      <div class="code-block">
+        <span class="lang-tag">bash</span>
+        <span class="comment"># Создать виртуальное окружение</span><br>
+        <span class="prompt">$</span> <span class="cmd">python3</span> <span class="flag">-m</span> venv .venv<br>
+        <br>
+        <span class="comment"># Активировать</span><br>
+        <span class="prompt">$</span> <span class="cmd">source</span> .venv/bin/activate <span class="dim">&nbsp;&nbsp;# Linux / Mac</span><br>
+        <span class="prompt">$</span> .venv\Scripts\<span class="cmd">activate</span> <span class="dim">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# Windows</span><br>
+        <br>
+        <span class="comment"># Установить все зависимости</span><br>
+        <span class="prompt">$</span> <span class="cmd">pip install</span> <span class="flag">-r</span> requirements.txt
+      </div>
+      <div class="info-box">
+        <span class="ib-icon">📦</span>
+        <div>
+          <strong>Что ставится:</strong>
+          python-telegram-bot, openai, ollama, cryptography, aiohttp, psutil, python-dotenv
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 5: STEP 3 — GET KEYS ═══════ -->
+  <div class="slide" data-slide="5">
+    <div class="slide-inner">
+      <span class="slide-number">05 / 11</span>
+      <h2><span class="step-badge">ШАГ 3</span> Получи API ключи</h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Три ключа, которые нужны для работы</p>
+      <table class="env-table">
+        <thead>
+          <tr>
+            <th>Ключ</th>
+            <th>Где получить</th>
+            <th>Тип</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>TELEGRAM_BOT_TOKEN</code></td>
+            <td>
+              <strong>@BotFather</strong> в Телеграме<br>
+              <span style="color:var(--muted); font-size:13px;">Напиши <code>/newbot</code> → дай имя → скопируй токен</span>
+            </td>
+            <td><span class="tag required">Обязательно</span></td>
+          </tr>
+          <tr>
+            <td><code>IO_NET_API_KEY</code></td>
+            <td>
+              <strong>cloud.io.net</strong><br>
+              <span style="color:var(--muted); font-size:13px;">Войди → API Keys → Create New Key</span>
+            </td>
+            <td><span class="tag required">Обязательно</span></td>
+          </tr>
+          <tr>
+            <td><code>ALLOWED_USER_IDS</code></td>
+            <td>
+              <strong>@userinfobot</strong> в Телеграме<br>
+              <span style="color:var(--muted); font-size:13px;">Напиши любое сообщение — получишь свой ID</span>
+            </td>
+            <td><span class="tag required">Обязательно</span></td>
+          </tr>
+          <tr>
+            <td><code>TOKEN_STORE_PASSWORD</code></td>
+            <td>
+              <strong>Придумай сам</strong><br>
+              <span style="color:var(--muted); font-size:13px;">Любой надёжный пароль для шифрования хранилища</span>
+            </td>
+            <td><span class="tag required">Обязательно</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 6: STEP 4 — FILL .ENV ═══════ -->
+  <div class="slide" data-slide="6">
+    <div class="slide-inner">
+      <span class="slide-number">06 / 11</span>
+      <h2><span class="step-badge">ШАГ 4</span> Заполни файл .env</h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Скопируй шаблон и вставь свои ключи</p>
+      <div class="code-block">
+        <span class="lang-tag">bash</span>
+        <span class="comment"># Скопировать шаблон</span><br>
+        <span class="prompt">$</span> <span class="cmd">cp</span> .env.example .env<br>
+        <br>
+        <span class="comment"># Открыть и заполнить</span><br>
+        <span class="prompt">$</span> <span class="cmd">nano</span> .env
+      </div>
+      <div class="code-block" style="margin-top: 12px;">
+        <span class="lang-tag">.env</span>
+        <span class="key">TELEGRAM_BOT_TOKEN</span>=<span class="value">7012345678:AAHxxxxxxxxxxxxxxxxxxxxxx</span><br>
+        <span class="key">IO_NET_API_KEY</span>=<span class="value">sk-xxxxxxxxxxxxxxxxxxxxxxxx</span><br>
+        <span class="key">ALLOWED_USER_IDS</span>=<span class="value">123456789</span><br>
+        <span class="key">TOKEN_STORE_PASSWORD</span>=<span class="value">my_super_secret_pass_2024</span><br>
+        <br>
+        <span class="comment"># Остальное можно не менять:</span><br>
+        <span class="key">OLLAMA_BASE_URL</span>=<span class="dim">http://localhost:11434</span><br>
+        <span class="key">OLLAMA_MODEL</span>=<span class="dim">llama3.2</span><br>
+        <span class="key">IONET_BASE_URL</span>=<span class="dim">https://api.intelligence.io.solutions/api/v1</span><br>
+        <span class="key">IONET_MODEL</span>=<span class="dim">meta-llama/Llama-3.3-70B-Instruct</span><br>
+        <span class="key">DASHBOARD_PORT</span>=<span class="dim">3000</span>
+      </div>
+      <div class="info-box warn">
+        <span class="ib-icon">⚠️</span>
+        <div><strong>Важно!</strong> Файл <code>.env</code> уже в <code>.gitignore</code> — он никогда не попадёт в git. Не делись им ни с кем!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 7: STEP 5 — OLLAMA ═══════ -->
+  <div class="slide" data-slide="7">
+    <div class="slide-inner">
+      <span class="slide-number">07 / 11</span>
+      <h2><span class="step-badge">ШАГ 5</span> Запусти Ollama <span class="tag optional">Опционально</span></h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Локальный AI — данные не покидают твой сервер</p>
+      <div class="code-block">
+        <span class="lang-tag">bash</span>
+        <span class="comment"># 1. Установить Ollama</span><br>
+        <span class="prompt">$</span> <span class="cmd">curl</span> <span class="flag">-fsSL</span> https://ollama.com/install.sh | <span class="cmd">sh</span><br>
+        <br>
+        <span class="comment"># 2. Скачать и запустить модель</span><br>
+        <span class="prompt">$</span> <span class="cmd">ollama run</span> <span class="string">llama3.2</span><br>
+        <br>
+        <span class="comment"># Модель скачается автоматически (~2GB)</span><br>
+        <span class="comment"># После скачивания Ollama будет работать на localhost:11434</span>
+      </div>
+      <div class="info-box">
+        <span class="ib-icon">💡</span>
+        <div>
+          <strong>Зачем нужен Ollama?</strong><br>
+          Команда <code>/local</code> использует Ollama для обработки чувствительных запросов.
+          OS-команды и пароли <strong>никогда не отправляются в облако</strong>.<br>
+          Если Ollama не нужен — просто пропусти этот шаг. Облачный <code>/ai</code> работает без него.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 8: STEP 6 — LAUNCH ═══════ -->
+  <div class="slide" data-slide="8">
+    <div class="slide-inner">
+      <span class="slide-number">08 / 11</span>
+      <h2><span class="step-badge">ШАГ 6</span> 🚀 Запусти бота!</h2>
+      <p class="subtitle" style="margin-bottom: 20px;">Финальная команда</p>
+      <div class="code-block" style="max-width: 600px; text-align: center;">
+        <span class="lang-tag">bash</span>
+        <span class="prompt">$</span> <span class="cmd" style="font-size: 20px;">python bot.py</span>
+      </div>
+      <div style="margin-top: 24px; text-align: center;">
+        <div style="font-size: 16px; color: var(--green); margin-bottom: 8px;">✅ Если всё ок — увидишь в консоли:</div>
+        <div class="code-block" style="max-width: 500px; border-color: rgba(0,255,136,0.2);">
+          <span style="color: var(--green);">✅ CloseCLAW is online!</span><br>
+          <span style="color: var(--green);">🚀 Starting CloseCLAW...</span>
+        </div>
+      </div>
+      <div style="margin-top: 24px; text-align: center;">
+        <div style="font-size: 16px; color: var(--cyan); margin-bottom: 8px;">Теперь открой Телеграм → найди бота → напиши:</div>
+        <div class="code-block" style="max-width: 300px; border-color: rgba(0,200,255,0.3); text-align: center;">
+          <span class="cmd" style="font-size: 22px;">/start</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 9: COMMANDS ═══════ -->
+  <div class="slide" data-slide="9">
+    <div class="slide-inner">
+      <span class="slide-number">09 / 11</span>
+      <h2>📟 Все команды бота</h2>
+      <div class="cmd-list">
+        <div class="cmd-row"><span class="c">/start</span><span class="d">Приветствие и список команд</span></div>
+        <div class="cmd-row"><span class="c">/status</span><span class="d">CPU, RAM, диск, запущенные боты</span></div>
+        <div class="cmd-row"><span class="c">/run &lt;команда&gt;</span><span class="d">Выполнить shell-команду на сервере</span></div>
+        <div class="cmd-row"><span class="c">/ai &lt;вопрос&gt;</span><span class="d">Спросить облачный AI (io.net)</span></div>
+        <div class="cmd-row"><span class="c">/local &lt;вопрос&gt;</span><span class="d">Спросить локальный AI (Ollama) — приватно</span></div>
+        <div class="cmd-row"><span class="c">/createbot &lt;описание&gt;</span><span class="d">Сгенерировать и запустить нового TG-бота</span></div>
+        <div class="cmd-row"><span class="c">/bots</span><span class="d">Список дочерних ботов</span></div>
+        <div class="cmd-row"><span class="c">/stopbot &lt;имя&gt;</span><span class="d">Остановить дочерний бот</span></div>
+        <div class="cmd-row"><span class="c">/tokens</span><span class="d">Показать сохранённые токены</span></div>
+        <div class="cmd-row"><span class="c">/addtoken &lt;имя&gt; &lt;токен&gt;</span><span class="d">Сохранить токен (AES-256)</span></div>
+        <div class="cmd-row"><span class="c">/removetoken &lt;имя&gt;</span><span class="d">Удалить токен</span></div>
+      </div>
+      <div class="info-box" style="margin-top: 14px;">
+        <span class="ib-icon">🧠</span>
+        <div><strong>Умный режим:</strong> Просто напиши что угодно без команды — бот сам решит куда отправить запрос (локально или в облако).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 10: SECURITY ═══════ -->
+  <div class="slide" data-slide="10">
+    <div class="slide-inner">
+      <span class="slide-number">10 / 11</span>
+      <h2>🔒 Безопасность</h2>
+      <p class="subtitle" style="margin-bottom: 24px;">Что нужно знать о защите</p>
+      <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="feature-card">
+          <div class="icon">🚫</div>
+          <div class="title">.env не в git</div>
+          <div class="desc">Файл с ключами добавлен в <code>.gitignore</code> — он никогда не попадёт в репозиторий. Никогда не делись файлом <code>.env</code>.</div>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🔐</div>
+          <div class="title">AES-256 шифрование</div>
+          <div class="desc">Токены дочерних ботов шифруются с помощью пароля <code>TOKEN_STORE_PASSWORD</code>. Без пароля — не расшифровать.</div>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🛡️</div>
+          <div class="title">Whitelist доступа</div>
+          <div class="desc">Только Telegram ID из <code>ALLOWED_USER_IDS</code> могут управлять ботом. Все остальные получат "⛔ Access denied".</div>
+        </div>
+        <div class="feature-card">
+          <div class="icon">🏠</div>
+          <div class="title">Локальный AI</div>
+          <div class="desc">Ollama обрабатывает чувствительные запросы на твоём сервере. Пароли и OS-команды никогда не уходят в облако.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ SLIDE 11: TROUBLESHOOTING + FINAL ═══════ -->
+  <div class="slide" data-slide="11">
+    <div class="slide-inner">
+      <span class="slide-number">11 / 11</span>
+      <h2>❗ Частые ошибки</h2>
+      <table class="env-table" style="max-width: 820px; margin-bottom: 24px;">
+        <thead><tr><th>Ошибка</th><th>Решение</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code style="color:var(--red);">TELEGRAM_BOT_TOKEN not set</code></td>
+            <td>Не заполнен файл <code>.env</code></td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--red);">Access denied</code> в боте</td>
+            <td>Твой ID не добавлен в <code>ALLOWED_USER_IDS</code></td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--red);">Ollama error</code></td>
+            <td>Ollama не запущен или модель не скачана</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--red);">io.net error</code></td>
+            <td>Неверный <code>IO_NET_API_KEY</code> или нет интернета</td>
+          </tr>
+          <tr>
+            <td><code style="color:var(--red);">ModuleNotFoundError</code></td>
+            <td>Не установлены зависимости / не активировано <code>.venv</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center; margin-top: 10px;">
+        <div class="ascii-logo" style="font-size: 10px; margin-bottom: 12px;">
+ ██████╗██╗      █████╗ ██╗    ██╗
+██╔════╝██║     ██╔══██╗██║    ██║
+██║     ██║     ███████║██║ █╗ ██║
+╚██████╗███████╗██║  ██║╚███╔███╔╝
+ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝
+        </div>
+        <p style="font-size: 18px; color: var(--cyan); font-weight: 600;">Готово! Теперь ты знаешь всё.</p>
+        <p style="color: var(--muted); margin-top: 8px; font-size: 14px;">
+          GitHub: <a href="https://github.com/Future-Web2/Close-Claw" style="color: var(--cyan); text-decoration: none;">github.com/Future-Web2/Close-Claw</a>
+        </p>
+        <p style="color: var(--muted); margin-top: 4px; font-size: 13px;">Built with 🤖 by Future-Web2</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Navigation ── -->
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>← Назад</button>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div class="nav-dots" id="navDots"></div>
+    <div class="slide-counter" id="slideCounter">1 / 12</div>
+  </div>
+  <button class="nav-btn primary" id="nextBtn" onclick="nextSlide()">Далее →</button>
+</div>
+
+<div class="kb-hint"><kbd>←</kbd> <kbd>→</kbd> навигация &nbsp;|&nbsp; <kbd>Space</kbd> автоплей</div>
+
+<script>
+// ── State ──
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let autoplayInterval = null;
+let isPlaying = false;
+
+// ── Create dots ──
+const dotsContainer = document.getElementById('navDots');
+for (let i = 0; i < total; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.onclick = () => goToSlide(i);
+  dotsContainer.appendChild(dot);
+}
+
+// ── Create particles ──
+const particlesEl = document.getElementById('particles');
+for (let i = 0; i < 25; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.animationDuration = (8 + Math.random() * 15) + 's';
+  p.style.animationDelay = Math.random() * 10 + 's';
+  p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+  particlesEl.appendChild(p);
+}
+
+// ── Navigation ──
+function goToSlide(idx) {
+  if (idx < 0 || idx >= total || idx === current) return;
+  const dir = idx > current ? 1 : -1;
+  slides[current].classList.remove('active');
+  slides[current].classList.add('exit');
+  setTimeout(() => slides[current - (current - current)], 50);
+
+  slides[current].style.transform = dir > 0 ? 'translateX(-80px)' : 'translateX(80px)';
+  slides[current].style.opacity = '0';
+
+  current = idx;
+
+  slides[current].style.transform = dir > 0 ? 'translateX(80px)' : 'translateX(-80px)';
+  requestAnimationFrame(() => {
+    slides[current].classList.remove('exit');
+    slides[current].classList.add('active');
+    slides[current].style.transform = 'translateX(0)';
+    slides[current].style.opacity = '1';
+  });
+
+  updateUI();
+  // Scroll slide content to top
+  const inner = slides[current].querySelector('.slide-inner');
+  if (inner) inner.scrollTop = 0;
+}
+
+function nextSlide() { goToSlide(current + 1); }
+function prevSlide() { goToSlide(current - 1); }
+
+function updateUI() {
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === total - 1;
+  document.getElementById('nextBtn').textContent = current === total - 1 ? '🏁 Конец' : 'Далее →';
+  document.getElementById('slideCounter').textContent = `${current + 1} / ${total}`;
+  document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('active', i === current);
+  });
+}
+
+// ── Autoplay ──
+function toggleAutoplay() {
+  if (isPlaying) {
+    clearInterval(autoplayInterval);
+    isPlaying = false;
+    document.getElementById('apIcon').textContent = '▶';
+    document.getElementById('apText').textContent = 'Автоплей';
+    document.getElementById('autoplayBtn').classList.remove('playing');
+  } else {
+    isPlaying = true;
+    document.getElementById('apIcon').textContent = '⏸';
+    document.getElementById('apText').textContent = 'Пауза';
+    document.getElementById('autoplayBtn').classList.add('playing');
+    autoplayInterval = setInterval(() => {
+      if (current < total - 1) {
+        nextSlide();
+      } else {
+        toggleAutoplay();
+      }
+    }, 6000);
+  }
+}
+
+// ── Keyboard ──
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+  if (e.key === ' ') { e.preventDefault(); toggleAutoplay(); }
+  if (e.key === 'Home') goToSlide(0);
+  if (e.key === 'End') goToSlide(total - 1);
+});
+
+// ── Touch swipe ──
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 60) {
+    diff > 0 ? nextSlide() : prevSlide();
+  }
+});
+
+updateUI();
+</script>
+</body>
+</html>
