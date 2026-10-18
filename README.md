@@ -202,6 +202,17 @@ MIT License — feel free to use, fork, and build on top of this.
 
 <div align="center">
 
+### 📺 Интерактивный Гайд
+
+[![Guide](https://img.shields.io/badge/📺_Interactive_Guide-Russian-00c8ff?style=for-the-badge)](docs/guide.html)
+
+> 🎬 **12 слайдов** — полный пошаговый гайд на русском: от клонирования до запуска.
+> Автоплей, анимации, клавиатурная навигация.
+>
+> **[▶ Открыть презентацию →](docs/guide.html)**
+
+---
+
 Built with 🤖 by [Future-Web2](https://github.com/Future-Web2)
 
 *CloseCLAW — Because your server deserves a brain.*
