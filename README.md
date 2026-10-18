@@ -19,7 +19,8 @@
 
 *Control your Linux server, spawn AI-powered bots, and route tasks intelligently — all from Telegram.*
 
-📺 **[Interactive Guide (RU)](docs/guide.html)** — пошаговая интерактивная презентация на русском
+🌐 **[Live Web App & Command Center](https://future-web2.github.io/Close-Claw/)** — интерактивный веб-сайт с симулятором, конфигуратором и полной инструкцией  
+📺 **[Interactive Guide (RU)](docs/guide.html)** — пошаговая интерактивная презентация на русском (12 слайдов)
 
 </div>
 
